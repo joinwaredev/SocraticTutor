@@ -1,0 +1,6 @@
+{
+  "name": "SocraticSpark: Socratic AI Math Tutor",
+  "description": "A compassionate, Socratic AI math tutor for 3rd-5th graders with step-by-step guidance, visual scaffolding, parent/teacher dashboard, and gamified rewards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
