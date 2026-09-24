@@ -4,6 +4,7 @@ import { VisualScaffolding } from './VisualScaffolding';
 import { ChatThread } from './ChatThread';
 import { ScratchpadModal } from './ScratchpadModal';
 import { ArrowLeft, Brain, Eye, Image as ImageIcon, Sparkles, CheckCircle2, RotateCcw, Lightbulb, Focus, Maximize2, Minimize2, PenTool } from 'lucide-react';
+import { soundFX } from '../utils/soundFX';
 import confetti from 'canvas-confetti';
 
 interface Props {
@@ -111,7 +112,10 @@ export const StudentTutorView: React.FC<Props> = ({
             {/* Kid Focus Mode Toggle */}
             <button
               type="button"
-              onClick={() => setIsFocusMode(!isFocusMode)}
+              onClick={() => {
+                soundFX.playPop();
+                setIsFocusMode(!isFocusMode);
+              }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs ${
                 isFocusMode
                   ? 'bg-amber-500 text-white shadow-xs ring-2 ring-amber-300'
@@ -126,7 +130,10 @@ export const StudentTutorView: React.FC<Props> = ({
             {/* Quick scratchpad button */}
             <button
               type="button"
-              onClick={() => setIsScratchpadOpen(true)}
+              onClick={() => {
+                soundFX.playPop();
+                setIsScratchpadOpen(true);
+              }}
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer"
               title="Open Whiteboard Scratchpad"
             >
@@ -138,7 +145,10 @@ export const StudentTutorView: React.FC<Props> = ({
             {imageBase64 && (
               <button
                 type="button"
-                onClick={() => setIsPhotoPreviewOpen(true)}
+                onClick={() => {
+                  soundFX.playPop();
+                  setIsPhotoPreviewOpen(true);
+                }}
                 className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition-all cursor-pointer border border-blue-200"
                 title="View your homework photo"
               >

@@ -3,6 +3,7 @@ import { GradeLevel, SampleProblem } from '../types';
 import { SAMPLE_PROBLEMS } from '../data/samples';
 import { Upload, Camera, Sparkles, BookOpen, Brain, Zap, Image as ImageIcon, CheckCircle, ArrowRight, RefreshCw, Smartphone, Settings2, ChevronDown, ChevronUp } from 'lucide-react';
 import { CameraCaptureModal } from './CameraCaptureModal';
+import { soundFX } from '../utils/soundFX';
 
 interface Props {
   onStartTutor: (params: {
@@ -71,6 +72,7 @@ export const ProblemUploader: React.FC<Props> = ({
   };
 
   const handleSelectSample = (sample: SampleProblem) => {
+    soundFX.playPop();
     setProblemText(sample.text);
     onSelectGrade(sample.grade);
     setImageBase64(sample.imageThumbnailSvg);
@@ -80,6 +82,7 @@ export const ProblemUploader: React.FC<Props> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!problemText.trim() && !imageBase64) return;
+    soundFX.playDing();
 
     onStartTutor({
       problemText,
@@ -92,6 +95,7 @@ export const ProblemUploader: React.FC<Props> = ({
   };
 
   const addMathSymbol = (sym: string) => {
+    soundFX.playPop();
     setProblemText((prev) => prev + sym);
   };
 
@@ -139,7 +143,10 @@ export const ProblemUploader: React.FC<Props> = ({
             <button
               key={grade}
               type="button"
-              onClick={() => onSelectGrade(grade)}
+              onClick={() => {
+                soundFX.playPop();
+                onSelectGrade(grade);
+              }}
               className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 selectedGrade === grade
                   ? 'bg-amber-500 text-white shadow-xs scale-102'

@@ -8,6 +8,7 @@ import { ParentTeacherDashboard } from './components/ParentTeacherDashboard';
 import { RewardRoom } from './components/RewardRoom';
 import { WestervilleCurriculumHub } from './components/WestervilleCurriculumHub';
 import { ConceptLibrary } from './components/ConceptLibrary';
+import { soundFX } from './utils/soundFX';
 import confetti from 'canvas-confetti';
 
 export default function App() {
@@ -47,6 +48,20 @@ export default function App() {
   const [badges, setBadges] = useState<Badge[]>(INITIAL_BADGES);
   const [costumes] = useState<SparkyCostume[]>(SPARKY_COSTUMES);
   const [activeCostumeId, setActiveCostumeId] = useState<string>('costume-detective');
+  const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(() => soundFX.getSoundEnabled());
+
+  const handleToggleSound = () => {
+    const nextState = !isSoundEnabled;
+    setIsSoundEnabled(nextState);
+    soundFX.setSoundEnabled(nextState);
+  };
+
+  const handleTabChangeWithSound = (tab: 'student' | 'concepts' | 'curriculum' | 'dashboard' | 'rewards') => {
+    if (tab !== activeTab) {
+      soundFX.playWhoosh();
+    }
+    setActiveTab(tab);
+  };
 
   // Sync to localStorage
   useEffect(() => {
@@ -66,6 +81,7 @@ export default function App() {
   }, [sessions]);
 
   const handleRewardStars = (amount: number) => {
+    soundFX.playDing();
     setStars((prev) => prev + amount);
   };
 
@@ -231,6 +247,7 @@ export default function App() {
 
           // If reached final step or completed
           if (data.metadata.currentStep >= (data.metadata.totalSteps || 3)) {
+            soundFX.playCelebration();
             confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
 
             // Record in session logs
@@ -306,13 +323,15 @@ export default function App() {
       {/* Top Navbar */}
       <Navbar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChangeWithSound}
         selectedGrade={selectedGrade}
         onGradeChange={setSelectedGrade}
         stars={stars}
         streakDays={streakDays}
         onNewProblem={handleNewProblem}
         activeCostumeIcon={activeCostume.icon}
+        isSoundEnabled={isSoundEnabled}
+        onToggleSound={handleToggleSound}
       />
 
       {/* Main Content Area */}

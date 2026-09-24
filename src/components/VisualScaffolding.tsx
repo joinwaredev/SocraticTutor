@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FractionScaffoldData, BalanceScaffoldData, ArrayGridScaffoldData, NumberLineScaffoldData, ScaffoldType } from '../types';
 import { Scale, PieChart, Grid3X3, ArrowRight, RefreshCw, Sparkles, PenTool } from 'lucide-react';
+import { soundFX } from '../utils/soundFX';
 
 interface Props {
   type: ScaffoldType;
@@ -76,6 +77,7 @@ export const VisualScaffolding: React.FC<Props> = ({ type, data = {}, onInteract
                     <button
                       key={i}
                       onClick={() => {
+                        soundFX.playPop();
                         const next = i + 1 === interactiveFractionA ? i : i + 1;
                         setInteractiveFractionA(next);
                         onInteract?.(`Changed Fraction A to ${next}/${interactiveDenominatorA}`);

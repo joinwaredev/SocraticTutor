@@ -1,6 +1,6 @@
 import React from 'react';
 import { GradeLevel } from '../types';
-import { Sparkles, Trophy, LineChart, BookOpen, PlusCircle, Lightbulb } from 'lucide-react';
+import { Sparkles, Trophy, LineChart, BookOpen, PlusCircle, Lightbulb, Volume2, VolumeX } from 'lucide-react';
 
 interface Props {
   activeTab: 'student' | 'concepts' | 'curriculum' | 'dashboard' | 'rewards';
@@ -11,6 +11,8 @@ interface Props {
   streakDays: number;
   onNewProblem: () => void;
   activeCostumeIcon: string;
+  isSoundEnabled: boolean;
+  onToggleSound: () => void;
 }
 
 export const Navbar: React.FC<Props> = ({
@@ -22,6 +24,8 @@ export const Navbar: React.FC<Props> = ({
   streakDays,
   onNewProblem,
   activeCostumeIcon,
+  isSoundEnabled,
+  onToggleSound,
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-amber-200/80 shadow-xs">
@@ -112,8 +116,27 @@ export const Navbar: React.FC<Props> = ({
           </button>
         </nav>
 
-        {/* Right Side: Currency & New Problem */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* Right Side: Sound FX Toggle, Currency & New Problem */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
+          {/* Sound FX Toggle */}
+          <button
+            type="button"
+            onClick={onToggleSound}
+            className={`p-2 rounded-xl border transition-all cursor-pointer flex items-center justify-center ${
+              isSoundEnabled
+                ? 'bg-amber-100/70 border-amber-300 text-amber-900 hover:bg-amber-200/80 shadow-2xs'
+                : 'bg-slate-100 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-200/70'
+            }`}
+            title={isSoundEnabled ? 'Sound Effects Enabled (Click to Mute)' : 'Sound Effects Muted (Click to Enable)'}
+            aria-label={isSoundEnabled ? 'Mute sound effects' : 'Enable sound effects'}
+          >
+            {isSoundEnabled ? (
+              <Volume2 className="w-4 h-4 text-amber-700" />
+            ) : (
+              <VolumeX className="w-4 h-4 text-slate-400" />
+            )}
+          </button>
+
           {/* Stars & Streak */}
           <div className="hidden sm:flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-2xl border border-amber-200 text-xs font-bold text-amber-900">
             <span title="Spark Stars">⭐ {stars}</span>

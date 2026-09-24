@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Badge, SparkyCostume } from '../types';
 import { Award, Lock, Sparkles, Check, Flame, Trophy, Shirt } from 'lucide-react';
+import { soundFX } from '../utils/soundFX';
 import confetti from 'canvas-confetti';
 
 interface Props {
@@ -38,6 +39,7 @@ export const RewardRoom: React.FC<Props> = ({
 
   const handlePurchase = (costume: SparkyCostume) => {
     if (stars < costume.cost) return;
+    soundFX.playCelebration();
     setUnlockedCostumeIds((prev) => [...prev, costume.id]);
     onBuyCostume(costume);
     fireConfetti();
@@ -133,6 +135,7 @@ export const RewardRoom: React.FC<Props> = ({
                   ) : isUnlocked ? (
                     <button
                       onClick={() => {
+                        soundFX.playDing();
                         onEquipCostume(costume.id);
                         fireConfetti();
                       }}

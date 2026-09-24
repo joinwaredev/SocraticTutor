@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage, StepMetadata } from '../types';
 import { Send, Volume2, VolumeX, HelpCircle, Lightbulb, CheckCircle2, Sparkles, ArrowRight, Brain, Smile } from 'lucide-react';
+import { soundFX } from '../utils/soundFX';
 
 interface Props {
   messages: ChatMessage[];
@@ -30,6 +31,7 @@ export const ChatThread: React.FC<Props> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim() || isLoading) return;
+    soundFX.playPop();
     onSendMessage(inputText.trim(), 'regular');
     setInputText('');
   };
@@ -181,7 +183,10 @@ export const ChatThread: React.FC<Props> = ({
         {/* "Why did we do that?" Button - Core user requirement! */}
         <button
           type="button"
-          onClick={() => onSendMessage('Why did we do that? Can you explain the rule or idea behind this step?', 'why')}
+          onClick={() => {
+            soundFX.playPop();
+            onSendMessage('Why did we do that? Can you explain the rule or idea behind this step?', 'why');
+          }}
           disabled={isLoading}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-900 text-xs font-bold transition-all shadow-xs hover:scale-102 cursor-pointer border border-purple-200"
         >
@@ -191,7 +196,10 @@ export const ChatThread: React.FC<Props> = ({
         {/* "Can I have a hint?" Button */}
         <button
           type="button"
-          onClick={() => onSendMessage('Can you give me a small hint to nudge my thinking?', 'hint')}
+          onClick={() => {
+            soundFX.playPop();
+            onSendMessage('Can you give me a small hint to nudge my thinking?', 'hint');
+          }}
           disabled={isLoading}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold transition-all shadow-xs hover:scale-102 cursor-pointer border border-amber-200"
         >
@@ -201,7 +209,10 @@ export const ChatThread: React.FC<Props> = ({
         {/* "Explain like I'm 8" Button */}
         <button
           type="button"
-          onClick={() => onSendMessage('Can you explain that using a fun story or pizza metaphor?', 'simplify')}
+          onClick={() => {
+            soundFX.playPop();
+            onSendMessage('Can you explain that using a fun story or pizza metaphor?', 'simplify');
+          }}
           disabled={isLoading}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-100 hover:bg-orange-200 text-orange-900 text-xs font-bold transition-all shadow-xs cursor-pointer border border-orange-200"
         >
@@ -211,7 +222,10 @@ export const ChatThread: React.FC<Props> = ({
         {/* "I'm ready for next step!" */}
         <button
           type="button"
-          onClick={() => onSendMessage("I understand this step! What's the next step to solve this?", 'check')}
+          onClick={() => {
+            soundFX.playDing();
+            onSendMessage("I understand this step! What's the next step to solve this?", 'check');
+          }}
           disabled={isLoading}
           className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 text-xs font-bold transition-all shadow-xs cursor-pointer border border-emerald-200"
         >
