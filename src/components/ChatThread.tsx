@@ -140,7 +140,7 @@ export const ChatThread: React.FC<Props> = ({
                   )}
                 </div>
 
-                {/* Footer with TTS and Model tag */}
+                {/* Footer with TTS */}
                 {isTutor && (
                   <div className="flex items-center gap-3 px-1 text-[11px] text-slate-400">
                     <button
@@ -151,9 +151,6 @@ export const ChatThread: React.FC<Props> = ({
                       {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-amber-600" /> : <Volume2 className="w-3.5 h-3.5" />}
                       <span>{isSpeaking ? 'Stop voice' : 'Listen'}</span>
                     </button>
-                    {msg.modelUsed && (
-                      <span className="text-[10px] text-slate-400">Model: {msg.modelUsed}</span>
-                    )}
                   </div>
                 )}
               </div>

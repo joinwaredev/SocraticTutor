@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { GradeLevel, SampleProblem } from '../types';
 import { SAMPLE_PROBLEMS } from '../data/samples';
-import { Upload, Camera, Sparkles, BookOpen, Brain, Zap, Image as ImageIcon, CheckCircle, ArrowRight } from 'lucide-react';
+import { Upload, Camera, Sparkles, BookOpen, Brain, Zap, Image as ImageIcon, CheckCircle, ArrowRight, RefreshCw, Smartphone, Settings2, ChevronDown, ChevronUp } from 'lucide-react';
+import { CameraCaptureModal } from './CameraCaptureModal';
 
 interface Props {
   onStartTutor: (params: {
@@ -34,7 +35,11 @@ export const ProblemUploader: React.FC<Props> = ({
   const [thinkingMode, setThinkingMode] = useState<boolean>(true);
   const [modelChoice, setModelChoice] = useState<string>('gemini-3.1-pro-preview');
   const [dragActive, setDragActive] = useState(false);
+  const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const mobileCameraInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -212,25 +217,50 @@ export const ProblemUploader: React.FC<Props> = ({
       {/* Main Upload / Input Form */}
       <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-6 shadow-sm border border-amber-200/80 space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Photo Dropzone */}
+          {/* Photo Dropzone & Camera Action */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
-              <span>📸 Option 1: Upload Problem Photo</span>
-              {imageBase64 && (
-                <button
-                  type="button"
-                  onClick={() => setImageBase64(null)}
-                  className="text-red-500 hover:text-red-600 text-xs font-medium cursor-pointer"
-                >
-                  Remove Photo
-                </button>
-              )}
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <Camera className="w-3.5 h-3.5 text-amber-600" />
+                <span>Option 1: Take Photo or Upload Worksheet</span>
+              </label>
 
+              {imageBase64 && (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsCameraModalOpen(true)}
+                    className="text-amber-600 hover:text-amber-700 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                  >
+                    <RefreshCw className="w-3 h-3" /> Retake
+                  </button>
+                  <span className="text-slate-300">|</span>
+                  <button
+                    type="button"
+                    onClick={() => setImageBase64(null)}
+                    className="text-red-500 hover:text-red-600 text-xs font-medium cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Standard file input */}
             <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
+              className="hidden"
+              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+            />
+
+            {/* Direct mobile camera capture input */}
+            <input
+              ref={mobileCameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
               className="hidden"
               onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
             />
@@ -241,35 +271,69 @@ export const ProblemUploader: React.FC<Props> = ({
                 onDragLeave={handleDrag}
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all min-h-[190px] ${
+                className={`border-2 border-dashed rounded-2xl p-5 flex flex-col items-center justify-center text-center transition-all min-h-[200px] ${
                   dragActive
                     ? 'border-amber-500 bg-amber-50/80 scale-101'
-                    : 'border-slate-300 hover:border-amber-400 bg-slate-50/70 hover:bg-amber-50/30'
+                    : 'border-slate-300 bg-slate-50/70 hover:border-amber-400 hover:bg-amber-50/20'
                 }`}
               >
-                <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mb-2 shadow-xs">
-                  <Camera className="w-6 h-6" />
+                {/* Two Clear Buttons: Camera Snapshot vs Upload */}
+                <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-sm mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsCameraModalOpen(true)}
+                    className="w-full flex-1 px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer hover:scale-102 active:scale-98"
+                  >
+                    <Camera className="w-4 h-4 shrink-0" />
+                    <span>Open Camera & Take Photo</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full sm:w-auto px-4 py-3 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+                  >
+                    <Upload className="w-4 h-4 text-slate-500" />
+                    <span>Upload File</span>
+                  </button>
                 </div>
-                <p className="text-sm font-bold text-slate-800">
-                  Drop photo here, or <span className="text-amber-600 underline">browse</span>
+
+                <p className="text-xs text-slate-500">
+                  Or drag and drop a worksheet photo here
                 </p>
-                <p className="text-xs text-slate-500 mt-1">
-                  Works with notebook handwriting, textbook pages, algebra, or calculus!
-                </p>
-                <div className="mt-3 flex items-center gap-2 text-[11px] text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-full">
-                  <Brain className="w-3 h-3 text-amber-700" /> Powered by Gemini Vision
+
+                <div className="mt-3 flex items-center justify-center gap-3">
+                  <span className="flex items-center gap-1.5 text-[11px] text-amber-800 bg-amber-100/70 px-2.5 py-0.5 rounded-full font-medium">
+                    <Brain className="w-3 h-3 text-amber-700" /> Handwriting & Textbooks
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => mobileCameraInputRef.current?.click()}
+                    className="text-[11px] text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer underline decoration-dotted sm:hidden"
+                  >
+                    <Smartphone className="w-3 h-3" /> Phone camera
+                  </button>
                 </div>
               </div>
             ) : (
-              <div className="relative rounded-2xl overflow-hidden border-2 border-amber-300 bg-slate-900/5 p-2 flex items-center justify-center min-h-[190px]">
+              <div className="relative rounded-2xl overflow-hidden border-2 border-amber-300 bg-slate-900/5 p-2 flex items-center justify-center min-h-[200px]">
                 <img
                   src={imageBase64}
                   alt="Problem to solve"
                   className="max-h-48 max-w-full rounded-xl object-contain shadow-xs"
                 />
-                <div className="absolute top-3 right-3 bg-emerald-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow">
+                <div className="absolute top-3 right-3 bg-emerald-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow">
                   <CheckCircle className="w-3 h-3" /> Photo Attached
+                </div>
+                <div className="absolute bottom-3 left-3 flex gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsCameraModalOpen(true)}
+                    className="bg-black/70 hover:bg-black/90 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg backdrop-blur flex items-center gap-1 transition-all cursor-pointer"
+                  >
+                    <Camera className="w-3 h-3" /> Retake Photo
+                  </button>
                 </div>
               </div>
             )}
@@ -306,42 +370,28 @@ export const ProblemUploader: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* AI Thinking & Model Settings */}
-        <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-4">
-            {/* Thinking Mode Toggle */}
-            <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-700">
-              <input
-                type="checkbox"
-                checked={thinkingMode}
-                onChange={(e) => setThinkingMode(e.target.checked)}
-                className="w-4 h-4 accent-amber-600 rounded cursor-pointer"
-              />
-              <span className="flex items-center gap-1">
-                <Brain className="w-3.5 h-3.5 text-purple-600" />
-                High Thinking Mode <span className="text-purple-600 font-bold">(gemini-3.1-pro-preview)</span>
-              </span>
-            </label>
+        {/* Bottom Action Bar: Clean Start for Kids + Discreet Parent/Teacher Settings */}
+        <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+            <button
+              type="button"
+              onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+            >
+              <Settings2 className="w-3.5 h-3.5 text-slate-400" />
+              <span>{showAdvancedSettings ? 'Hide Settings' : 'Teacher / Parent Options'}</span>
+              {showAdvancedSettings ? <ChevronUp className="w-3 h-3 text-slate-400" /> : <ChevronDown className="w-3 h-3 text-slate-400" />}
+            </button>
 
-            {/* Model Choice Pill */}
-            <div className="flex items-center gap-1 text-xs">
-              <span className="text-slate-400">Model:</span>
-              <select
-                value={modelChoice}
-                onChange={(e) => setModelChoice(e.target.value)}
-                className="bg-slate-100 border border-slate-200 text-slate-700 rounded-lg px-2 py-1 text-xs font-medium cursor-pointer outline-none"
-              >
-                <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview (Deep Socratic & Vision)</option>
-                <option value="gemini-3.5-flash">gemini-3.5-flash (Standard Socratic)</option>
-                <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (Fast Hints)</option>
-              </select>
-            </div>
+            <span className="text-[11px] text-emerald-600 font-medium hidden sm:flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-emerald-500" /> Step-by-step Socratic check active
+            </span>
           </div>
 
           <button
             type="submit"
             disabled={isLoading || (!problemText.trim() && !imageBase64)}
-            className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-heading font-bold text-sm sm:text-base shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-heading font-bold text-sm sm:text-base shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer hover:scale-101 active:scale-99"
           >
             {isLoading ? (
               <>
@@ -356,6 +406,44 @@ export const ProblemUploader: React.FC<Props> = ({
             )}
           </button>
         </div>
+
+        {/* Collapsible Advanced Settings (For Parents / Teachers / Testing) */}
+        {showAdvancedSettings && (
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-3 animate-in fade-in duration-150">
+            <div className="font-bold text-slate-700 flex items-center justify-between">
+              <span>⚙️ AI Engine Tuning</span>
+              <span className="text-[11px] font-normal text-slate-500">Defaults are already optimized for Westerville grades 3–5</span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={thinkingMode}
+                  onChange={(e) => setThinkingMode(e.target.checked)}
+                  className="w-4 h-4 accent-amber-600 rounded cursor-pointer"
+                />
+                <span className="flex items-center gap-1">
+                  <Brain className="w-3.5 h-3.5 text-purple-600" />
+                  Deep Reasoning & Socratic Scaffolding Mode
+                </span>
+              </label>
+
+              <div className="flex items-center gap-1.5 text-xs">
+                <span className="text-slate-500 font-medium">Model:</span>
+                <select
+                  value={modelChoice}
+                  onChange={(e) => setModelChoice(e.target.value)}
+                  className="bg-white border border-slate-300 text-slate-700 rounded-lg px-2.5 py-1 text-xs font-medium cursor-pointer outline-none shadow-2xs"
+                >
+                  <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview (Deep Socratic & Vision)</option>
+                  <option value="gemini-3.5-flash">gemini-3.5-flash (Standard Socratic)</option>
+                  <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (Fast Hints)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
       </form>
 
       {/* Pre-made Sample Problems for One-Click Testing */}
@@ -400,6 +488,16 @@ export const ProblemUploader: React.FC<Props> = ({
           ))}
         </div>
       </div>
+
+      {/* Live Camera Viewfinder Modal */}
+      <CameraCaptureModal
+        isOpen={isCameraModalOpen}
+        onClose={() => setIsCameraModalOpen(false)}
+        onCapture={(base64, mime) => {
+          setImageBase64(base64);
+          setImageMimeType(mime);
+        }}
+      />
     </div>
   );
 };
